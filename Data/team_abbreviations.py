@@ -27,8 +27,9 @@ team_map = {
     'St. Louis Blues': 'STL',
     'Tampa Bay Lightning': 'TBL',
     'Toronto Maple Leafs': 'TOR',
+    'Utah Hockey Club': 'UTA',
     'Vancouver Canucks': 'VAN',
-    'Vegas Golden Knights': 'VGK',
+    'Vegas Golden Knights': 'VEG',
     'Washington Capitals': 'WSH',
     'Winnipeg Jets': 'WPG'
 }
