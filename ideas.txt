@@ -1,0 +1,10 @@
+ideas to try next:
+
+1) Implement an elo system for each team:
+-Algorith could use previous season data to evaluate "strength" of a team
+-Win rate last season, did they make playoffs, how far did they make it, etc.
+
+Elo could be updated after every game. Each team is given a base elo of lets say 100.
+After each game, depending on whether they won and by how much, elo can increase.
+
+

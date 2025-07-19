@@ -38,6 +38,12 @@ def main():
     goalie_stats = pd.concat(goalie_data).reset_index(drop=True)
     combined = pd.concat([full_games.reset_index(drop=True), final_scores, goalie_stats], axis=1)
 
+    # Drop games where either team is the Arizona Coyotes
+    combined = combined[
+        (combined['Home'] != 'Arizona Coyotes') &
+        (combined['Visitor'] != 'Arizona Coyotes')
+        ]
+
     # Transform to team-level rows (home + away)
     # Transform to team-level rows
     logger.info("Transforming to team-level rows...")
@@ -80,6 +86,50 @@ def main():
     combined_team_view['Date'] = pd.to_datetime(combined_team_view['Date'])
     combined_team_view = combined_team_view.sort_values(by=['Team', 'Date']).reset_index(drop=True)
 
+    #####
+    # 1. Initialize Elo ratings
+    initial_elo = 1500
+    teams = combined_team_view['Team'].unique()
+    elo_ratings = {team: initial_elo for team in teams}
+
+    elo_features = []
+
+    # 2. Loop through each game and update ratings
+    for idx, row in combined_team_view.iterrows():
+        team = row['Team']
+        opponent = row['Opponent']
+        venue = row['venue']
+        result = row['Result']  # 1 if win, 0 if loss
+
+        # Optional: home-ice advantage
+        team_elo = elo_ratings[team] + (35 if venue == 'Home' else 0)
+        opponent_elo = elo_ratings[opponent]
+
+        # Store Elo features BEFORE the game
+        elo_features.append({
+            'team_elo': team_elo,
+            'opponent_elo': opponent_elo,
+            'elo_diff': team_elo - opponent_elo
+        })
+
+        # Calculate expected outcome
+        expected_win = 1 / (1 + 10 ** ((opponent_elo - team_elo) / 400))
+
+        # Elo update (K-factor can be tuned)
+        k = 20
+        change = k * (result - expected_win)
+        elo_ratings[team] += change
+        elo_ratings[opponent] -= change
+
+    # Convert Elo features to DataFrame
+    elo_df = pd.DataFrame(elo_features)
+
+    # Merge with combined_team_view
+    combined_team_view = pd.concat([combined_team_view.reset_index(drop=True), elo_df], axis=1)
+
+    ####
+
+
     combined_team_view.to_csv("games.csv", index=False)
     logger.info("Saved games.csv")
 
@@ -89,6 +139,12 @@ def main():
     model = tune_model(data[data["Date"] < "2024-04-19"], predictors)
     results, precision = make_predictions(data, predictors, model)
     logger.info(f"Final model precision: {precision:.2f}, {(precision * 100):.2f}% accuracy")
+
+    testing = combined_team_view[combined_team_view['Date'] > "2024-04-19"]
+    prec = model.predict(testing[predictors])
+
+    from sklearn.metrics import classification_report
+    print(classification_report(testing['Result'], prec))
 
     # Further precision results
     results = results.merge(combined_team_view[['Date', 'Team', 'Opponent', 'Result']], on=['Date', 'Team'], how='left')
