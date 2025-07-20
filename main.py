@@ -116,7 +116,7 @@ def main():
         expected_win = 1 / (1 + 10 ** ((opponent_elo - team_elo) / 400))
 
         # Elo update (K-factor can be tuned)
-        k = 20
+        k = 30
         change = k * (result - expected_win)
         elo_ratings[team] += change
         elo_ratings[opponent] -= change
@@ -140,7 +140,7 @@ def main():
     results, precision = make_predictions(data, predictors, model)
     logger.info(f"Final model precision: {precision:.2f}, {(precision * 100):.2f}% accuracy")
 
-    testing = combined_team_view[combined_team_view['Date'] > "2024-04-19"]
+    testing = data[data['Date'] > "2024-04-19"]
     prec = model.predict(testing[predictors])
 
     from sklearn.metrics import classification_report

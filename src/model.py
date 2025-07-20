@@ -21,6 +21,6 @@ def tune_model(data, predictors):
         'reg_alpha': [0, 1, 5, 10],
         'reg_lambda': [0, 1, 5, 10]
     }
-    GS = GridSearchCV(model, search_grid, scoring="accuracy", cv=5, verbose=2)
+    GS = GridSearchCV(model, search_grid, scoring=["accuracy", 'f1', 'roc_auc'], refit='f1', cv=5, verbose=2)
     GS.fit(data[predictors], data['Result'])
     return GS.best_estimator_

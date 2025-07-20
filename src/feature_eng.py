@@ -3,7 +3,7 @@ import pandas as pd
 
 # Function that computes rolling averages for each teams given which stats to compute rolling
 # averages for, as well as the window. Returns
-def rolling_averages(team, cols, new_cols, window=3):
+def rolling_averages(team, cols, new_cols, window=10):
     team = team.sort_values("Date")    # Getting team data organized chronologically
     rolling = team[cols].rolling(window, closed='left').mean()   # closed=left to ignore current row in sliding window
     team[new_cols] = rolling
@@ -11,7 +11,7 @@ def rolling_averages(team, cols, new_cols, window=3):
     return team
 
 def prepare_model_data(df, cutoff_date, team_column='Team'):
-    cols = ['G', 'GA', 'S', 'S%', 'SV%', 'PIM', 'Result']
+    cols = ['G', 'S', 'SV%', 'Result']
     new_cols = [f"{c}_rolling" for c in cols]
     df['Date'] = pd.to_datetime(df['Date'])
 
