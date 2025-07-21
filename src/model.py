@@ -1,14 +1,14 @@
 from sklearn.metrics import precision_score
 from xgboost import XGBClassifier
 from sklearn.model_selection import GridSearchCV
+import pandas as pd
 
 def make_predictions(data, predictors, model, cutoff='2024-04-19'):
     train = data[data['Date'] < cutoff]
     test = data[data['Date'] > cutoff]
     model.fit(train[predictors], train['Result'])
     preds = model.predict(test[predictors])
-    combined = test.copy()
-    combined['prediction'] = preds
+    combined  = pd.DataFrame(dict(actual=test['Result'], prediction = preds), index=test.index)
     precision = precision_score(test['Result'], preds)
     return combined, precision
 

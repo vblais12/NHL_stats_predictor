@@ -7,4 +7,27 @@ ideas to try next:
 Elo could be updated after every game. Each team is given a base elo of lets say 100.
 After each game, depending on whether they won and by how much, elo can increase.
 
+2) moneypuck.ccom
+-download the game-by-game datasets for 2022-2025 seasons
+-extract xG
 
+
+
+
+
+alt_search_grid = {
+    'n_estimators' : [50, 100, 200],
+    'max_depth' : [9, 12, 15],
+    'min_samples_split': [5, 10, 15]
+}
+
+
+
+GS = GridSearchCV(
+    estimator = test_model,
+    param_grid = alt_search_grid,
+    scoring = ["accuracy", 'f1'],
+    refit = "f1",
+    cv = TSS,
+    verbose= 4
+)

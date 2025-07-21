@@ -126,7 +126,7 @@ def main():
 
     # Merge with combined_team_view
     combined_team_view = pd.concat([combined_team_view.reset_index(drop=True), elo_df], axis=1)
-
+    new = ['team_elo', 'opponent_elo', 'elo_diff']
     ####
 
 
@@ -136,6 +136,7 @@ def main():
     # Load and run model
     data = pd.read_csv("games.csv")
     data, predictors = prepare_model_data(data, '2024-04-19')
+    predictors = predictors + new
     model = tune_model(data[data["Date"] < "2024-04-19"], predictors)
     results, precision = make_predictions(data, predictors, model)
     logger.info(f"Final model precision: {precision:.2f}, {(precision * 100):.2f}% accuracy")
@@ -147,7 +148,7 @@ def main():
     print(classification_report(testing['Result'], prec))
 
     # Further precision results
-    results = results.merge(combined_team_view[['Date', 'Team', 'Opponent', 'Result']], on=['Date', 'Team'], how='left')
+    results = results.merge(combined_team_view[['Date', 'Team', 'Opponent', 'Result']], left_index=True, right_index=True)
 
     final = results.merge(results, left_on=['Date', 'Team'], right_on=['Date', 'Opponent'], suffixes=('_team', '_opponent'))  # few games will drop due to rolling windows
 
