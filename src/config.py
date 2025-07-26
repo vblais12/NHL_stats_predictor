@@ -7,5 +7,4 @@ HEADERS = {
     "Referer": "https://www.google.com/"
 }
 
-SEASONS = [str(s) for s in range(2022,2026)]
 
