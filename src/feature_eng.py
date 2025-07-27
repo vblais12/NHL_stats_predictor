@@ -11,6 +11,8 @@ def rolling_averages(team, cols, new_cols, window=10):
     return team
 
 
+# Function to compute elo features.
+### Returns a pandas dataframe with team elo, opp elo, and elo differential
 def compute_elo(data, k=30, base_elo=1500):
     teams = data['Team'].unique()
     elo_ratings = {team: base_elo for team in teams}
@@ -21,7 +23,7 @@ def compute_elo(data, k=30, base_elo=1500):
     for idx, row in data.iterrows():
         team = row['Team']
         opponent = row['Opponent']
-        result = row['Result']  # 1 if win, 0 if loss
+        result = row['Result']
 
         # Optional: home-ice advantage
         team_elo = elo_ratings[team]
@@ -47,23 +49,9 @@ def compute_elo(data, k=30, base_elo=1500):
 
 
 def get_opponent_diff(df, stat_cols):
+    diff_col = []
     for stat in stat_cols:
         df[f'{stat}_diff'] = df[stat] - df[f'Opponent_{stat}']
-    return df
+        diff_col.append(f'{stat}_diff')
+    return df, diff_col
 
-
-"""
-def prepare_model_data(df, cutoff_date, team_column='Team'):
-    cols = ['G', 'S', 'SV%', 'Result']
-    new_cols = [f"{c}_rolling" for c in cols]
-    df['Date'] = pd.to_datetime(df['Date'])
-
-    result = df.groupby(team_column).apply(lambda x: rolling_averages(x, cols, new_cols))
-    result = result.droplevel(0).reset_index(drop=True)
-    result['venue'] = result['venue'].map({'Home': 1, 'Away': 0})
-    result['opponent'] = result['Opponent'].astype('category').cat.codes
-    predict = ['opponent', 'venue']
-
-    return result, new_cols + predict
-
-"""
