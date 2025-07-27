@@ -11,6 +11,8 @@ def rolling_averages(team, cols, new_cols, window=10):
     return team
 
 
+# Function to compute elo features.
+### Returns a pandas dataframe with team elo, opp elo, and elo differential
 def compute_elo(data, k=30, base_elo=1500):
     teams = data['Team'].unique()
     elo_ratings = {team: base_elo for team in teams}
@@ -21,7 +23,7 @@ def compute_elo(data, k=30, base_elo=1500):
     for idx, row in data.iterrows():
         team = row['Team']
         opponent = row['Opponent']
-        result = row['Result']  # 1 if win, 0 if loss
+        result = row['Result']
 
         # Optional: home-ice advantage
         team_elo = elo_ratings[team]
@@ -47,9 +49,11 @@ def compute_elo(data, k=30, base_elo=1500):
 
 
 def get_opponent_diff(df, stat_cols):
+    diff_col = []
     for stat in stat_cols:
         df[f'{stat}_diff'] = df[stat] - df[f'Opponent_{stat}']
-    return df
+        diff_col.append(f'{stat}_diff')
+    return df, diff_col
 
 
 """

@@ -2,6 +2,7 @@ import os
 import requests
 import time
 from src.config import CACHE_DIR
+import hashlib
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 # Takes URL --> file name for caching
 def url_to_file(url):
-    return url.split('/')[-1]
+    return hashlib.md5(url.encode('utf-8')).hexdigest() + '.html'
 
 # Function to get html from a page. Checks cache first, else fetches page then caches
 def get_page(url, headers=None):
