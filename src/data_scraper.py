@@ -28,7 +28,7 @@ def get_page(url, headers=None):
         response = requests.get(url, headers=headers)
         time.sleep(3.1)
         response.raise_for_status()
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(file, 'w', encoding='utf-8') as f:
             f.write(response.text)
             logger.info(f"File cached. Excellent. Moving right along")
         return response.text
